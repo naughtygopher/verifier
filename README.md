@@ -87,5 +87,5 @@ You can customize the following components of verifier.
 ```
 
 ## TODO
-1. Implement the Redis store implementation
-2. Implement a Postgres store implementation
+1. Complete the Redis store implementation
+2. Add a Postgres store implementation
