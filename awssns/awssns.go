@@ -23,8 +23,8 @@ type AWSSNS struct {
 	sns *sns.SNS
 }
 
-// SendSMS sends a transactional SMS using AWS SNS service
-func (awssns *AWSSNS) SendSMS(recipient string, body string) (interface{}, error) {
+// Send sends a transactional SMS using AWS SNS service
+func (awssns *AWSSNS) Send(recipient string, body string) (interface{}, error) {
 	params := &sns.PublishInput{
 		Message:     aws.String(body),
 		PhoneNumber: aws.String(recipient),

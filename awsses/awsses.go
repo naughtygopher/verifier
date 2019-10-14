@@ -65,6 +65,7 @@ func (awsses *AWSSES) Send(sender, recipient, subject, body string) (interface{}
 	return result, nil
 }
 
+// NewService returns an instance of AWSES after initializing all required dependencies
 func NewService(cfg *Config) (*AWSSES, error) {
 	sess, err := session.NewSession(
 		&aws.Config{
