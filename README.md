@@ -13,7 +13,7 @@ It generates secrets with an expiry, appropriate for emails & mobile phones. In 
 it generates a 256 character long random alpha-numeric string, and a 6 character long numeric string
 for mobile phones.
 
-By default, it has [AWS SES](https://aws.amazon.com/ses/) for sending e-mails & [AWS SNS](https://aws.amazon.com/sns/) for sending SMS/text messages.
+By default, it uses [AWS SES](https://aws.amazon.com/ses/) for sending e-mails & [AWS SNS](https://aws.amazon.com/sns/) for sending SMS/text messages.
 
 ## How to customize?
 
