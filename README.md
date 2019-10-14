@@ -4,9 +4,10 @@
 
 # Verifier
 
-Verifier package lets you verify emails & phone numbers with very flexble implementation at different stages.
+Verifier package lets you verify emails & phone numbers with very flexble implementation at different stages. There's a functional sample app available
+in the `cmd` directory.
 
-## How it works?
+## How does it work?
 
 It generates secrets with an expiry, appropriate for emails & mobile phones. In case of emails, 
 it generates a 256 character long random alpha-numeric string, and a 6 character long numeric string
@@ -84,3 +85,7 @@ You can customize the following components of verifier.
     }
     // ==
 ```
+
+## TODO
+1. Implement the Redis store implementation
+2. Implement a Postgres store implementation
