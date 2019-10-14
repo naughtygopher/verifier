@@ -73,7 +73,7 @@ type Config struct {
 	// MobileCfg is used to configure AWS SNS handler
 	MobileCfg *awssns.Config `json:"mobileCfg,omitempty"`
 
-	// MaxVerifyAttempts is used to set the maximum number of times verification attemts can be made
+	// MaxVerifyAttempts is used to set the maximum number of times verification attempts can be made
 	MaxVerifyAttempts int `json:"maxVerifyAttempts,omitempty"`
 	// EmailOTPExpiry is used to define the expiry of a secret generated to verify email
 	EmailOTPExpiry time.Duration `json:"emailOTPExpiry,omitempty"`
