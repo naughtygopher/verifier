@@ -6,7 +6,7 @@
 
 # Verifier
 
-Verifier package lets you verify emails & phone numbers with very flexble implementation at different stages. There's a functional sample app available
+Verifier package lets you verify emails & phone numbers, with customization available at different components. There's a functional sample app available
 in the `cmd` directory.
 
 ## How does it work?
