@@ -1,5 +1,7 @@
+[![](https://travis-ci.org/bnkamalesh/verifier.svg?branch=master)](https://travis-ci.org/bnkamalesh/verifier)
+[![coverage](https://img.shields.io/codecov/c/github/bnkamalesh/verifier.svg)](https://codecov.io/gh/bnkamalesh/verifier)
 [![](https://goreportcard.com/badge/github.com/bnkamalesh/verifier)](https://goreportcard.com/report/github.com/bnkamalesh/verifier)
-[![](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/bnkamalesh/verifier/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/46f26b25639d09d0419d/maintainability)](https://codeclimate.com/github/bnkamalesh/verifier/maintainability)
 [![](https://godoc.org/github.com/nathany/looper?status.svg)](http://godoc.org/github.com/bnkamalesh/verifier)
 
 # Verifier

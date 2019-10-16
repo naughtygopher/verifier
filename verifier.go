@@ -183,7 +183,6 @@ func (ver *Verifier) NewRequest(ctype commType, recipient string) (*Verification
 			secExpiry = now.Add(ver.cfg.MobileOTPExpiry)
 			secret = randomNumericString(6)
 		}
-
 	}
 
 	verReq := &Verification{

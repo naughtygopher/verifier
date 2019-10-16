@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	regexMobile = regexp.MustCompile(`^(\+)?([0-9]+){7,24}$`)
+	regexMobile = regexp.MustCompile(`^(\+)?([0-9]){7,24}$`)
 )
 
 func init() {
