@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -9,10 +10,11 @@ import (
 	"github.com/bnkamalesh/verifier"
 	"github.com/bnkamalesh/verifier/awsses"
 	"github.com/bnkamalesh/verifier/awssns"
+	"github.com/bnkamalesh/verifier/stores"
 )
 
-func config() *verifier.Config {
-	httpClient := &http.Client{
+func newHTTPClient() *http.Client {
+	return &http.Client{
 		Transport: &http.Transport{
 			Dial: (&net.Dialer{
 				Timeout: 3 * time.Second,
@@ -21,45 +23,167 @@ func config() *verifier.Config {
 		},
 		Timeout: time.Second * 5,
 	}
-	cfg := &verifier.Config{
-		MailCfg: &awsses.Config{
-			Region:     "us-west-2",
-			AccessKey:  os.Getenv("AWSSES_AK"),
-			Secret:     os.Getenv("AWSSES_SEC"),
-			HTTPClient: httpClient,
-		},
-		MobileCfg: &awssns.Config{
-			Region:     "us-west-2",
-			AccessKey:  os.Getenv("AWSSES_AK"),
-			Secret:     os.Getenv("AWSSES_SEC"),
-			HTTPClient: httpClient,
-		},
+}
 
+func mailmobileConfig(httpClient *http.Client) (*awsses.Config, *awssns.Config) {
+	return &awsses.Config{
+			Region:     "us-west-2",
+			AccessKey:  os.Getenv("AWSSES_AK"),
+			Secret:     os.Getenv("AWSSES_SEC"),
+			HTTPClient: httpClient,
+		},
+		&awssns.Config{
+			Region:     "us-west-2",
+			AccessKey:  os.Getenv("AWSSES_AK"),
+			Secret:     os.Getenv("AWSSES_SEC"),
+			HTTPClient: httpClient,
+		}
+}
+
+func redisConfig() *stores.RedisConfig {
+	return &stores.RedisConfig{
+		Hosts: []string{
+			"localhost:6379",
+		},
+		DialTimeoutSecs:  time.Second * 3,
+		ReadTimeoutSecs:  time.Second * 1,
+		WriteTimeoutSecs: time.Second * 2,
+	}
+}
+
+func config() *verifier.Config {
+	cfg := &verifier.Config{
 		DefaultEmailSub:  "",
 		DefaultFromEmail: "noreply@example.com",
-		EmailCallbackURL: "https://example.com/verification",
+		EmailCallbackURL: "https://example.com/verify-email",
 		EmailOTPExpiry:   time.Hour * 12,
 		MobileOTPExpiry:  time.Minute * 10,
 	}
 	return cfg
 }
 
+func notifyWithoutCustomRequest(vsvc *verifier.Verifier) {
+	const mobile = "+919876543210"
+	err := vsvc.NewMobile(mobile)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	const email = "john.doe@example.com"
+	err = vsvc.NewEmail(email, "")
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	err = vsvc.VerifyMobileSecret(mobile, "secret")
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	err = vsvc.VerifyEmailSecret(email, "secret")
+	if err != nil {
+		println(err.Error())
+		return
+	}
+}
+
+func notifyWithCustomRequest(vsvc *verifier.Verifier) {
+	req, err := vsvc.NewRequest(
+		verifier.CommTypeMobile,
+		"+919876543210",
+	)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	err = vsvc.NewMobileWithReq(
+		req,
+		fmt.Sprintf(
+			verifier.DefaultSMSOTPPayload,
+			req.Secret,
+			req.SecretExpiry.String(),
+		),
+	)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	err = vsvc.VerifyMobileSecret(req.Recipient, req.Secret)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	req, err = vsvc.NewRequest(
+		verifier.CommTypeEmail,
+		"john.doe@example.com",
+	)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	err = vsvc.NewEmailWithReq(
+		req,
+		"verify your email",
+		fmt.Sprintf(
+			verifier.DefaultEmailOTPPayload,
+			req.Secret,
+			req.SecretExpiry.String(),
+		),
+	)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	err = vsvc.VerifyEmailSecret(req.Recipient, req.Secret)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+}
+
 func main() {
-	vsvc, err := verifier.New(config())
+
+	store, err := stores.NewRedis(redisConfig())
 	if err != nil {
 		println(err.Error())
 		return
 	}
 
-	err = vsvc.NewMobile("+919876543210")
+	httpClient := newHTTPClient()
+	mailCfg, mobCfg := mailmobileConfig(httpClient)
+
+	mailservice, err := awsses.NewService(mailCfg)
 	if err != nil {
 		println(err.Error())
 		return
 	}
 
-	err = vsvc.NewEmail("john.doe@example.com", "")
+	mobService, err := awssns.NewService(mobCfg)
 	if err != nil {
 		println(err.Error())
 		return
 	}
+
+	vsvc, err := verifier.New(
+		config(),
+		store,
+		mailservice,
+		mobService,
+	)
+
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	notifyWithCustomRequest(vsvc)
+	// notifyWithoutCustomRequest(vsvc)
 }

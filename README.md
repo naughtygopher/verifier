@@ -4,14 +4,13 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/46f26b25639d09d0419d/maintainability)](https://codeclimate.com/github/bnkamalesh/verifier/maintainability)
 [![](https://godoc.org/github.com/nathany/looper?status.svg)](http://godoc.org/github.com/bnkamalesh/verifier)
 
-# Verifier
+# Verifier v0.1.0
 
-Verifier package lets you verify emails & phone numbers, with customization available at different components. There's a functional sample app available
-in the `cmd` directory.
+Verifier package lets you verify emails & phone numbers, with customization available at different components. There's a functional (if provided with valid configurations) sample app provided [here](https://github.com/bnkamalesh/verifier/blob/master/cmd/main.go).
 
 ## How does it work?
 
-It generates secrets with an expiry, appropriate for emails & mobile phones. In case of emails, 
+Verifier generates secrets with an expiry, appropriate for emails & mobile phones. In case of emails, 
 it generates a 256 character long random alpha-numeric string, and a 6 character long numeric string
 for mobile phones.
 
@@ -89,5 +88,6 @@ You can customize the following components of verifier.
 ```
 
 ## TODO
-1. Complete the Redis store implementation
-2. Add a Postgres store implementation
+1. Add a Postgres store implementation
+2. Unit tests
+3. Setup a web service, which can be independently run, and consumed via APIs

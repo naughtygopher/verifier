@@ -48,8 +48,6 @@ func TestConfig_init(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := &Config{
-				MailCfg:           tt.fields.MailCfg,
-				MobileCfg:         tt.fields.MobileCfg,
 				MaxVerifyAttempts: tt.fields.MaxVerifyAttempts,
 				EmailOTPExpiry:    tt.fields.EmailOTPExpiry,
 				MobileOTPExpiry:   tt.fields.MobileOTPExpiry,
@@ -92,7 +90,7 @@ func TestVerifier_validate(t *testing.T) {
 	}
 	type args struct {
 		secret string
-		verreq *Verification
+		verreq *Request
 	}
 	tests := []struct {
 		name    string
@@ -110,7 +108,7 @@ func TestVerifier_validate(t *testing.T) {
 			},
 			args: args{
 				secret: "helloworld",
-				verreq: &Verification{
+				verreq: &Request{
 					Secret:       "helloworld",
 					SecretExpiry: &validExpiry,
 				},
@@ -126,7 +124,7 @@ func TestVerifier_validate(t *testing.T) {
 			},
 			args: args{
 				secret: "helloworld",
-				verreq: &Verification{
+				verreq: &Request{
 					Secret:       "helloworld",
 					SecretExpiry: &validExpiry,
 					Attempts:     2,
@@ -143,7 +141,7 @@ func TestVerifier_validate(t *testing.T) {
 			},
 			args: args{
 				secret: "helloworld",
-				verreq: &Verification{
+				verreq: &Request{
 					Secret:       "helloworld",
 					SecretExpiry: &invalidExpiry,
 				},
@@ -159,7 +157,7 @@ func TestVerifier_validate(t *testing.T) {
 			},
 			args: args{
 				secret: "helloworld",
-				verreq: &Verification{
+				verreq: &Request{
 					Secret:       "helloworld-2",
 					SecretExpiry: &validExpiry,
 				},

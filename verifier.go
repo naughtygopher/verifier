@@ -4,16 +4,13 @@ package verifier
 import (
 	"errors"
 	"time"
-
-	"github.com/bnkamalesh/verifier/awsses"
-	"github.com/bnkamalesh/verifier/awssns"
 )
 
 const (
 	// CommTypeMobile communication type mobile
-	CommTypeMobile = commType("mobile")
+	CommTypeMobile = CommType("mobile")
 	// CommTypeEmail communication type email
-	CommTypeEmail = commType("email")
+	CommTypeEmail = CommType("email")
 
 	// VerStatusPending verification status pending
 	VerStatusPending = verificationStatus("pending")
@@ -44,8 +41,8 @@ var (
 	ErrEmptyMobileMessageBody = errors.New("empty mobile message body")
 )
 
-// commType defines the communication type (SMS, Email)
-type commType string
+// CommType defines the communication type (mobile, Email)
+type CommType string
 
 // verificationStatus defines the status of a verification request (e.g. pending, verified, rejected)
 type verificationStatus string
@@ -61,6 +58,11 @@ type mobileService interface {
 	// This might be a single ref ID or more info based on the service we're using
 	Send(recipient, body string) (interface{}, error)
 }
+type store interface {
+	Create(ver *Request) (*Request, error)
+	ReadLastPending(ctype CommType, recipient string) (*Request, error)
+	Update(verID string, ver *Request) (*Request, error)
+}
 
 func newID() string {
 	return randomString(32)
@@ -68,11 +70,6 @@ func newID() string {
 
 // Config has all the configurations required for verifier package to function
 type Config struct {
-	// MailCfg is used to configure AWS SES handler
-	MailCfg *awsses.Config `json:"mailCfg,omitempty"`
-	// MobileCfg is used to configure AWS SNS handler
-	MobileCfg *awssns.Config `json:"mobileCfg,omitempty"`
-
 	// MaxVerifyAttempts is used to set the maximum number of times verification attempts can be made
 	MaxVerifyAttempts int `json:"maxVerifyAttempts,omitempty"`
 	// EmailOTPExpiry is used to define the expiry of a secret generated to verify email
@@ -109,10 +106,10 @@ type CommStatus struct {
 	Data   map[string]interface{} `json:"data,omitempty"`
 }
 
-// Verification struct holds all data related to a single verification request
-type Verification struct {
+// Request struct holds all data related to a single verification request
+type Request struct {
 	ID           string            `json:"id,omitempty"`
-	Type         commType          `json:"type,omitempty"`
+	Type         CommType          `json:"type,omitempty"`
 	Sender       string            `json:"sender,omitempty"`
 	Recipient    string            `json:"recipient,omitempty"`
 	Data         map[string]string `json:"data,omitempty"`
@@ -128,7 +125,7 @@ type Verification struct {
 	UpdatedAt  *time.Time         `json:"updatedAt,omitempty"`
 }
 
-func (v *Verification) setStatus(status interface{}, err error) {
+func (v *Request) setStatus(status interface{}, err error) {
 	if status != nil {
 		if len(v.CommStatus) == 0 {
 			v.CommStatus = make([]CommStatus, 0, 1)
@@ -172,7 +169,7 @@ type Verifier struct {
 }
 
 // NewRequest is used to create a new verification request
-func (ver *Verifier) NewRequest(ctype commType, recipient string) (*Verification, error) {
+func (ver *Verifier) NewRequest(ctype CommType, recipient string) (*Request, error) {
 	now := time.Now()
 	secExpiry := now.Add(ver.cfg.EmailOTPExpiry)
 	secret := randomString(256)
@@ -185,7 +182,7 @@ func (ver *Verifier) NewRequest(ctype commType, recipient string) (*Verification
 		}
 	}
 
-	verReq := &Verification{
+	verReq := &Request{
 		ID:           newID(),
 		Type:         ctype,
 		Recipient:    recipient,
@@ -203,7 +200,7 @@ func (ver *Verifier) NewRequest(ctype commType, recipient string) (*Verification
 	return verReq, nil
 }
 
-func (ver *Verifier) verifySecret(ctype commType, recipient, secret string) error {
+func (ver *Verifier) verifySecret(ctype CommType, recipient, secret string) error {
 	verreq, err := ver.store.ReadLastPending(ctype, recipient)
 	if err != nil {
 		return err
@@ -212,7 +209,7 @@ func (ver *Verifier) verifySecret(ctype commType, recipient, secret string) erro
 	return ver.verifyAndUpdate(secret, verreq)
 }
 
-func (ver *Verifier) validate(secret string, verreq *Verification) error {
+func (ver *Verifier) validate(secret string, verreq *Request) error {
 	if verreq.Attempts > ver.cfg.MaxVerifyAttempts {
 		return ErrMaximumAttemptsExceeded
 	}
@@ -231,7 +228,7 @@ func (ver *Verifier) validate(secret string, verreq *Verification) error {
 
 // verifyAndUpdate verifies all conditions required to verify a secret. And then update
 // the status of verification in the store
-func (ver *Verifier) verifyAndUpdate(secret string, verreq *Verification) error {
+func (ver *Verifier) verifyAndUpdate(secret string, verreq *Request) error {
 	var err error
 	now := time.Now()
 	verreq.UpdatedAt = &now
@@ -286,7 +283,7 @@ func (ver *Verifier) VerifyEmailSecret(recipient, secret string) error {
 }
 
 // NewEmailWithReq is used to send a mail with a custom verification request
-func (ver *Verifier) NewEmailWithReq(verreq *Verification, subject, body string) error {
+func (ver *Verifier) NewEmailWithReq(verreq *Request, subject, body string) error {
 	err := validateEmailAddress(verreq.Recipient)
 	if err != nil {
 		return err
@@ -356,7 +353,7 @@ func (ver *Verifier) NewEmail(recipient, subject string) error {
 }
 
 // NewMobileWithReq creates a new request for mobile number verification
-func (ver *Verifier) NewMobileWithReq(verreq *Verification, body string) error {
+func (ver *Verifier) NewMobileWithReq(verreq *Request, body string) error {
 	err := validateMobile(verreq.Recipient)
 	if err != nil {
 		return err
@@ -428,39 +425,8 @@ func (ver *Verifier) CustomMobileHandler(mobile mobileService) error {
 	return nil
 }
 
-// New returns a new isntance of Verifier with all the dependencies initialized
-func New(cfg *Config) (*Verifier, error) {
-	verstore, err := newstore()
-	if err != nil {
-		return nil, err
-	}
-
-	email, err := awsses.NewService(cfg.MailCfg)
-	if err != nil {
-		return nil, err
-	}
-
-	mobile, err := awssns.NewService(cfg.MobileCfg)
-	if err != nil {
-		return nil, err
-	}
-
-	if cfg.MaxVerifyAttempts < 1 {
-		cfg.MaxVerifyAttempts = 3
-	}
-
-	v := &Verifier{
-		cfg:           cfg,
-		emailHandler:  email,
-		mobileHandler: mobile,
-		store:         verstore,
-	}
-
-	return v, nil
-}
-
-// NewCustom lets you customize various components
-func NewCustom(cfg *Config, verStore store, email emailService, mobile mobileService) (*Verifier, error) {
+// New lets you customize various components
+func New(cfg *Config, verStore store, email emailService, mobile mobileService) (*Verifier, error) {
 	cfg.init()
 
 	v := &Verifier{
