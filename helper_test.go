@@ -96,13 +96,6 @@ func Test_validateEmailAddress(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name: "Invalid email - no '.'",
-			args: args{
-				email: "hello@examplecom",
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -201,6 +194,72 @@ func Test_validateMobile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := validateMobile(tt.args.mobile); (err != nil) != tt.wantErr {
 				t.Errorf("validateMobile() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_emailBody(t *testing.T) {
+	type args struct {
+		callbackURL string
+		expiry      string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		{
+			name: "valid mail body",
+			args: args{
+				callbackURL: "https://example.com",
+				expiry:      "expiry_date",
+			},
+			want: fmt.Sprintf(
+				DefaultEmailOTPPayload,
+				"https://example.com",
+				"expiry_date",
+			),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := emailBody(tt.args.callbackURL, tt.args.expiry); got != tt.want {
+				t.Errorf("emailBody() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_smsBody(t *testing.T) {
+	type args struct {
+		secret string
+		expiry string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		{
+			name: "valid body",
+			args: args{
+				secret: "<otp>",
+				expiry: "[expires at]",
+			},
+			want: fmt.Sprintf(
+				DefaultSMSOTPPayload,
+				"<otp>",
+				"[expires at]",
+			),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := smsBody(tt.args.secret, tt.args.expiry); got != tt.want {
+				t.Errorf("smsBody() = %v, want %v", got, tt.want)
 			}
 		})
 	}

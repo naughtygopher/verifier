@@ -2,13 +2,52 @@
 package verifier
 
 import (
+	"errors"
 	"fmt"
+	"reflect"
+	"regexp"
 	"testing"
 	"time"
 
 	"github.com/bnkamalesh/verifier/awsses"
 	"github.com/bnkamalesh/verifier/awssns"
 )
+
+type mockstore struct {
+	data map[string]*Request
+}
+
+func (ms *mockstore) Create(ver *Request) (*Request, error) {
+	key := fmt.Sprintf(
+		"%s-%s",
+		ver.Type,
+		ver.Recipient,
+	)
+	ms.data[key] = ver
+	return ver, nil
+}
+func (ms *mockstore) ReadLastPending(ctype CommType, recipient string) (*Request, error) {
+	key := fmt.Sprintf(
+		"%s-%s",
+		ctype,
+		recipient,
+	)
+	req, ok := ms.data[key]
+	if !ok {
+		return nil, errors.New("not found")
+	}
+	return req, nil
+}
+
+func (ms *mockstore) Update(verID string, ver *Request) (*Request, error) {
+	key := fmt.Sprintf(
+		"%s-%s",
+		ver.Type,
+		ver.Recipient,
+	)
+	ms.data[key] = ver
+	return ver, nil
+}
 
 func TestConfig_init(t *testing.T) {
 	type fields struct {
@@ -175,6 +214,117 @@ func TestVerifier_validate(t *testing.T) {
 			}
 			if err := ver.validate(tt.args.secret, tt.args.verreq); (err != nil) != tt.wantErr {
 				t.Errorf("Verifier.validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_newID(t *testing.T) {
+	regex := regexp.MustCompile("^[0-9a-zA-Z]{32}$")
+	tests := []struct {
+		name string
+		want string
+	}{
+		// TODO: Add test cases.
+		{
+			name: "alpha numeric 32 char long random string",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := newID()
+			if !regex.MatchString(got) {
+				t.Fatalf("Expected 32 chr long alpha numeric random string, got '%s'", got)
+			}
+		})
+	}
+}
+
+func TestRequest_setStatus(t *testing.T) {
+	type fields struct {
+		ID           string
+		Type         CommType
+		Sender       string
+		Recipient    string
+		Data         map[string]string
+		Secret       string
+		SecretExpiry *time.Time
+		Attempts     int
+		CommStatus   []CommStatus
+		Status       verificationStatus
+		CreatedAt    *time.Time
+		UpdatedAt    *time.Time
+	}
+	type args struct {
+		status interface{}
+		err    error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+		{
+			name: "with status",
+			args: args{
+				status: "hello world",
+			},
+			fields: fields{},
+		},
+		{
+			name: "with error",
+			args: args{
+				status: nil,
+				err:    errors.New("some error"),
+			},
+			fields: fields{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &Request{
+				ID:           tt.fields.ID,
+				Type:         tt.fields.Type,
+				Sender:       tt.fields.Sender,
+				Recipient:    tt.fields.Recipient,
+				Data:         tt.fields.Data,
+				Secret:       tt.fields.Secret,
+				SecretExpiry: tt.fields.SecretExpiry,
+				Attempts:     tt.fields.Attempts,
+				CommStatus:   tt.fields.CommStatus,
+				Status:       tt.fields.Status,
+				CreatedAt:    tt.fields.CreatedAt,
+				UpdatedAt:    tt.fields.UpdatedAt,
+			}
+			v.setStatus(tt.args.status, tt.args.err)
+
+			if tt.args.err != nil {
+				got := v.CommStatus[0]
+				if got.Status != "failed" {
+					t.Fatalf("expected status 'failed', got '%s'", got.Status)
+				}
+				wantData := map[string]interface{}{
+					"error": tt.args.err.Error(),
+				}
+				if !reflect.DeepEqual(wantData, got.Data) {
+					t.Fatalf("expected '%v', got '%v'", wantData, got.Data)
+				}
+				return
+			}
+
+			if tt.args.status != nil {
+				got := v.CommStatus[0]
+				if got.Status != "queued" {
+					t.Fatalf("expected status 'queued', got '%s'", got.Status)
+				}
+
+				wantData := map[string]interface{}{
+					"status": tt.args.status,
+				}
+				if !reflect.DeepEqual(wantData, got.Data) {
+					t.Fatalf("expected '%v', got '%v'", wantData, got.Data)
+				}
 			}
 		})
 	}
