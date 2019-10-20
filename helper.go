@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"net/url"
 	"regexp"
-	"strings"
 	"time"
 )
 
@@ -62,14 +61,9 @@ func randomNumericString(n int) string {
 }
 
 // validateEmailAddress offline validation of email.
+// Removed most checks, to be compatible with IPv6 email addresses as well
 func validateEmailAddress(email string) error {
-	parts := strings.Split(email, "@")
-	if len(parts) != 2 {
-		return ErrInvalidEmail
-	}
-
-	parts = strings.Split(parts[1], ".")
-	if len(parts) < 2 {
+	if len(email) < 6 {
 		return ErrInvalidEmail
 	}
 	return nil
