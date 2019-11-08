@@ -25,7 +25,8 @@ func newHTTPClient() *http.Client {
 	}
 }
 
-func mailmobileConfig(httpClient *http.Client) (*awsses.Config, *awssns.Config) {
+func mailmobileConfig() (*awsses.Config, *awssns.Config) {
+	httpClient := newHTTPClient()
 	return &awsses.Config{
 			Region:     "us-west-2",
 			AccessKey:  os.Getenv("AWSSES_AK"),
@@ -48,6 +49,24 @@ func redisConfig() *stores.RedisConfig {
 		DialTimeoutSecs:  time.Second * 3,
 		ReadTimeoutSecs:  time.Second * 1,
 		WriteTimeoutSecs: time.Second * 2,
+	}
+}
+
+func postgresConfig() *stores.PostgresConfig {
+	return &stores.PostgresConfig{
+		Host:      "localhost",
+		Port:      "5432",
+		Username:  "user1",
+		Password:  "password",
+		StoreName: "mydb",
+		PoolSize:  100,
+
+		DialTimeoutSecs:  time.Second * 10,
+		ReadTimeoutSecs:  time.Second * 10,
+		WriteTimeoutSecs: time.Second * 20,
+		IdleTimeoutSecs:  time.Minute * 5,
+
+		TableName: "VerificationRequests",
 	}
 }
 
@@ -151,14 +170,7 @@ func notifyWithCustomRequest(vsvc *verifier.Verifier) {
 
 func main() {
 
-	store, err := stores.NewRedis(redisConfig())
-	if err != nil {
-		println(err.Error())
-		return
-	}
-
-	httpClient := newHTTPClient()
-	mailCfg, mobCfg := mailmobileConfig(httpClient)
+	mailCfg, mobCfg := mailmobileConfig()
 
 	mailservice, err := awsses.NewService(mailCfg)
 	if err != nil {
@@ -172,13 +184,29 @@ func main() {
 		return
 	}
 
+	// redisstore, err := stores.NewRedis(redisConfig())
+	// if err != nil {
+	// 	println(err.Error())
+	// 	return
+	// }
+	// vsvc, err := verifier.New(
+	// 	config(),
+	// 	redisstore,
+	// 	mailservice,
+	// 	mobService,
+	// )
+
+	postgrestore, err := stores.NewPostgres(postgresConfig())
+	if err != nil {
+		println(err.Error())
+		return
+	}
 	vsvc, err := verifier.New(
 		config(),
-		store,
+		postgrestore,
 		mailservice,
 		mobService,
 	)
-
 	if err != nil {
 		println(err.Error())
 		return
