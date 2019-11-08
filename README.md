@@ -88,6 +88,5 @@ You can customize the following components of verifier.
 ```
 
 ## TODO
-1. Add a Postgres store implementation
-2. Unit tests
+1. Unit tests
 3. Setup a web service, which can be independently run, and consumed via APIs
