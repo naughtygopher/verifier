@@ -1,3 +1,6 @@
+<p align="center"><img src="https://repository-images.githubusercontent.com/214951539/5b1d4880-be23-11ea-956f-13b099260266" alt="verifier gopher" width="256px"/></p>
+
+
 [![](https://travis-ci.org/bnkamalesh/verifier.svg?branch=master)](https://travis-ci.org/bnkamalesh/verifier)
 [![coverage](https://img.shields.io/codecov/c/github/bnkamalesh/verifier.svg)](https://codecov.io/gh/bnkamalesh/verifier)
 [![](https://goreportcard.com/badge/github.com/bnkamalesh/verifier)](https://goreportcard.com/report/github.com/bnkamalesh/verifier)
@@ -90,3 +93,7 @@ You can customize the following components of verifier.
 ## TODO
 1. Unit tests
 3. Setup a web service, which can be independently run, and consumed via APIs
+
+## The gopher
+
+The gopher used here was created using [Gopherize.me](https://gopherize.me/). Verifier helps you keep those scammers and bots away just like our hacker gopher!
