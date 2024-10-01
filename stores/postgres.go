@@ -9,9 +9,9 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/bnkamalesh/verifier"
+	"github.com/naughtygopher/verifier"
 )
 
 // structToMapStringWithTag converts a struct to map[string]interface{}, where keys are fetched from
@@ -32,10 +32,10 @@ type PostgresConfig struct {
 	PoolSize  int    `json:"poolSize,omitempty"`
 	SSLMode   string `json:"sslMode,omitempty"`
 
-	DialTimeoutSecs  time.Duration `json:"dialTimeoutSecs,omitempty"`
-	ReadTimeoutSecs  time.Duration `json:"readTimeoutSecs,omitempty"`
-	WriteTimeoutSecs time.Duration `json:"writeTimeoutSecs,omitempty"`
-	IdleTimeoutSecs  time.Duration `json:"idleTimeoutSecs,omitempty"`
+	DialTimeout  time.Duration `json:"dialTimeoutSecs,omitempty"`
+	ReadTimeout  time.Duration `json:"readTimeoutSecs,omitempty"`
+	WriteTimeout time.Duration `json:"writeTimeoutSecs,omitempty"`
+	IdleTimeout  time.Duration `json:"idleTimeoutSecs,omitempty"`
 
 	TableName string `json:"tableName,omitempty"`
 }
@@ -88,7 +88,7 @@ func (pgs *Postgres) Create(req *verifier.Request) (*verifier.Request, error) {
 		return nil, err
 	}
 
-	ctx, _ := ctxWithTimeout(nil, pgs.cfg.WriteTimeoutSecs)
+	ctx, _ := ctxWithTimeout(context.Background(), pgs.cfg.WriteTimeout)
 	_, err = pgs.pqdriver.Exec(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (pgs *Postgres) ReadLastPending(ctype verifier.CommType, recipient string) 
 		return nil, err
 	}
 
-	ctx, _ := ctxWithTimeout(nil, pgs.cfg.ReadTimeoutSecs)
+	ctx, _ := ctxWithTimeout(context.Background(), pgs.cfg.ReadTimeout)
 	row := pgs.pqdriver.QueryRow(
 		ctx,
 		query,
@@ -210,10 +210,10 @@ func NewPostgres(cfg *PostgresConfig) (*Postgres, error) {
 		return nil, err
 	}
 
-	poolcfg.MaxConnLifetime = cfg.IdleTimeoutSecs
+	poolcfg.MaxConnLifetime = cfg.IdleTimeout
 	poolcfg.MaxConns = int32(cfg.PoolSize)
 
-	pool, err := pgxpool.ConnectConfig(context.Background(), poolcfg)
+	pool, err := pgxpool.NewWithConfig(context.Background(), poolcfg)
 	if err != nil {
 		return nil, err
 	}

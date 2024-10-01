@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/bnkamalesh/verifier"
-	"github.com/bnkamalesh/verifier/awsses"
-	"github.com/bnkamalesh/verifier/awssns"
-	"github.com/bnkamalesh/verifier/stores"
+	"github.com/naughtygopher/verifier"
+	"github.com/naughtygopher/verifier/awsses"
+	"github.com/naughtygopher/verifier/awssns"
+	"github.com/naughtygopher/verifier/stores"
 )
 
 func newHTTPClient() *http.Client {
@@ -46,9 +46,9 @@ func redisConfig() *stores.RedisConfig {
 		Hosts: []string{
 			"localhost:6379",
 		},
-		DialTimeoutSecs:  time.Second * 3,
-		ReadTimeoutSecs:  time.Second * 1,
-		WriteTimeoutSecs: time.Second * 2,
+		DialTimeout:  time.Second * 3,
+		ReadTimeout:  time.Second * 1,
+		WriteTimeout: time.Second * 2,
 	}
 }
 
@@ -61,10 +61,10 @@ func postgresConfig() *stores.PostgresConfig {
 		StoreName: "mydb",
 		PoolSize:  100,
 
-		DialTimeoutSecs:  time.Second * 10,
-		ReadTimeoutSecs:  time.Second * 10,
-		WriteTimeoutSecs: time.Second * 20,
-		IdleTimeoutSecs:  time.Minute * 5,
+		DialTimeout:  time.Second * 10,
+		ReadTimeout:  time.Second * 10,
+		WriteTimeout: time.Second * 20,
+		IdleTimeout:  time.Minute * 5,
 
 		TableName: "VerificationRequests",
 	}

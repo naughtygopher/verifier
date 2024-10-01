@@ -1,19 +1,14 @@
 <p align="center"><img src="https://repository-images.githubusercontent.com/214951539/5b1d4880-be23-11ea-956f-13b099260266" alt="verifier gopher" width="256px"/></p>
 
-
-[![](https://travis-ci.org/bnkamalesh/verifier.svg?branch=master)](https://travis-ci.org/bnkamalesh/verifier)
-[![coverage](https://img.shields.io/codecov/c/github/bnkamalesh/verifier.svg)](https://codecov.io/gh/bnkamalesh/verifier)
-[![](https://goreportcard.com/badge/github.com/bnkamalesh/verifier)](https://goreportcard.com/report/github.com/bnkamalesh/verifier)
-[![Maintainability](https://api.codeclimate.com/v1/badges/46f26b25639d09d0419d/maintainability)](https://codeclimate.com/github/bnkamalesh/verifier/maintainability)
-[![](https://godoc.org/github.com/nathany/looper?status.svg)](http://godoc.org/github.com/bnkamalesh/verifier)
+[![](https://godoc.org/github.com/nathany/looper?status.svg)](http://godoc.org/github.com/naughtygopher/verifier)
 
 # Verifier v0.1.0
 
-Verifier package lets you verify emails & phone numbers, with customization available at different components. There's a functional (if provided with valid configurations) sample app provided [here](https://github.com/bnkamalesh/verifier/blob/master/cmd/main.go).
+Verifier package lets you verify emails & phone numbers, with customization available at different components. There's a functional (if provided with valid configurations) sample app provided [here](https://github.com/naughtygopher/verifier/blob/master/cmd/main.go).
 
 ## How does it work?
 
-Verifier generates secrets with an expiry, appropriate for emails & mobile phones. In case of emails, 
+Verifier generates secrets with an expiry, appropriate for emails & mobile phones. In case of emails,
 it generates a 256 character long random alpha-numeric string, and a 6 character long numeric string
 for mobile phones.
 
@@ -24,7 +19,7 @@ By default, it uses [AWS SES](https://aws.amazon.com/ses/) for sending e-mails &
 You can customize the following components of verifier.
 
 ```golang
-    
+
     // Customize the default templates
     // there should be 2 string placeholders for email body. First is the 'callback URL' and 2nd is the expiry
     verifier.DefaultEmailOTPPayload = ``
@@ -37,7 +32,7 @@ You can customize the following components of verifier.
 		log.Println(err)
 		return
     }
-    
+
     // Service provider for sending emails
     err := v.CustomEmailHandler(email)
 	if err != nil {
@@ -53,7 +48,7 @@ You can customize the following components of verifier.
 		return err
     }
     // ==
-    
+
     // Persistent store used by verifier for storing secrets and all the requests
 	err = v.CustomStore(verStore)
 	if err != nil {
@@ -91,8 +86,9 @@ You can customize the following components of verifier.
 ```
 
 ## TODO
+
 1. Unit tests
-3. Setup a web service, which can be independently run, and consumed via APIs
+2. Setup a web service, which can be independently run, and consumed via APIs
 
 ## The gopher
 

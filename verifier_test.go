@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bnkamalesh/verifier/awsses"
-	"github.com/bnkamalesh/verifier/awssns"
+	"github.com/naughtygopher/verifier/awsses"
+	"github.com/naughtygopher/verifier/awssns"
 )
 
 type mockstore struct {

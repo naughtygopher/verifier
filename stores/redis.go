@@ -7,17 +7,17 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/vmihailenco/msgpack/v4"
 
-	"github.com/bnkamalesh/verifier"
+	"github.com/naughtygopher/verifier"
 )
 
 // RedisConfig holds all the configuration required for the redis handler
 type RedisConfig struct {
-	Hosts            []string      `json:"hosts,omitempty"`
-	Username         string        `json:"username,omitempty"`
-	Password         string        `json:"password,omitempty"`
-	DialTimeoutSecs  time.Duration `json:"dialTimeoutSecs,omitempty"`
-	ReadTimeoutSecs  time.Duration `json:"readTimeoutSecs,omitempty"`
-	WriteTimeoutSecs time.Duration `json:"writeTimeoutSecs,omitempty"`
+	Hosts        []string      `json:"hosts,omitempty"`
+	Username     string        `json:"username,omitempty"`
+	Password     string        `json:"password,omitempty"`
+	DialTimeout  time.Duration `json:"dialTimeoutSecs,omitempty"`
+	ReadTimeout  time.Duration `json:"readTimeoutSecs,omitempty"`
+	WriteTimeout time.Duration `json:"writeTimeoutSecs,omitempty"`
 }
 
 // Redis struct exposes all the store functionalities required for verifier
@@ -118,10 +118,10 @@ func NewRedis(cfg *RedisConfig) (*Redis, error) {
 		&redis.UniversalOptions{
 			Addrs:        cfg.Hosts,
 			Password:     cfg.Password,
-			DialTimeout:  cfg.DialTimeoutSecs,
-			ReadTimeout:  cfg.ReadTimeoutSecs,
-			WriteTimeout: cfg.WriteTimeoutSecs,
-			PoolTimeout:  cfg.WriteTimeoutSecs * 10,
+			DialTimeout:  cfg.DialTimeout,
+			ReadTimeout:  cfg.ReadTimeout,
+			WriteTimeout: cfg.WriteTimeout,
+			PoolTimeout:  cfg.WriteTimeout * 10,
 		},
 	)
 
