@@ -2,7 +2,7 @@
 
 [![](https://godoc.org/github.com/nathany/looper?status.svg)](http://godoc.org/github.com/naughtygopher/verifier)
 
-# Verifier v0.1.0
+# Verifier
 
 Verifier package lets you verify emails & phone numbers, with customization available at different components. There's a functional (if provided with valid configurations) sample app provided [here](https://github.com/naughtygopher/verifier/blob/master/cmd/main.go).
 
