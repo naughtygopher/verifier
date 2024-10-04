@@ -1,5 +1,6 @@
 <p align="center"><img src="https://repository-images.githubusercontent.com/214951539/5b1d4880-be23-11ea-956f-13b099260266" alt="verifier gopher" width="256px"/></p>
 
+[![](https://github.com/naughtygopher/verifier/actions/workflows/go.yml/badge.svg)](https://github.com/naughtygopher/verifier/actions)
 [![](https://godoc.org/github.com/nathany/looper?status.svg)](http://godoc.org/github.com/naughtygopher/verifier)
 
 # Verifier
