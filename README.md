@@ -1,7 +1,9 @@
 <p align="center"><img src="https://repository-images.githubusercontent.com/214951539/5b1d4880-be23-11ea-956f-13b099260266" alt="verifier gopher" width="256px"/></p>
 
 [![](https://github.com/naughtygopher/verifier/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/naughtygopher/verifier/actions)
-[![](https://godoc.org/github.com/nathany/looper?status.svg)](http://godoc.org/github.com/naughtygopher/verifier)
+[![Go Reference](https://pkg.go.dev/badge/github.com/naughtygopher/verifier.svg)](https://pkg.go.dev/github.com/naughtygopher/verifier)
+[![Go Report Card](https://goreportcard.com/badge/github.com/naughtygopher/verifier)](https://goreportcard.com/report/github.com/naughtygopher/verifier)
+[![Coverage Status](https://coveralls.io/repos/github/naughtygopher/verifier/badge.svg?branch=master)](https://coveralls.io/github/naughtygopher/verifier?branch=master)
 
 # Verifier
 
