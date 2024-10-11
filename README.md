@@ -4,6 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/naughtygopher/verifier.svg)](https://pkg.go.dev/github.com/naughtygopher/verifier)
 [![Go Report Card](https://goreportcard.com/badge/github.com/naughtygopher/verifier)](https://goreportcard.com/report/github.com/naughtygopher/verifier)
 [![Coverage Status](https://coveralls.io/repos/github/naughtygopher/verifier/badge.svg?branch=master)](https://coveralls.io/github/naughtygopher/verifier?branch=master)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/creativecreature/sturdyc/blob/master/LICENSE)
 
 # Verifier
 
