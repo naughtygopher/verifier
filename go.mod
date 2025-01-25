@@ -4,10 +4,10 @@ go 1.22
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/aws/aws-sdk-go v1.55.5
+	github.com/aws/aws-sdk-go v1.55.6
 	github.com/fatih/structs v1.1.0
 	github.com/go-redis/redis v6.15.9+incompatible
-	github.com/jackc/pgx/v5 v5.7.1
+	github.com/jackc/pgx/v5 v5.7.2
 	github.com/vmihailenco/msgpack/v4 v4.3.13
 )
 
@@ -24,10 +24,10 @@ require (
 	github.com/onsi/gomega v1.34.2 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/vmihailenco/tagparser v0.1.2 // indirect
-	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	google.golang.org/protobuf v1.36.4 // indirect
 )
